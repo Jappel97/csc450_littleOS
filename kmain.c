@@ -4,6 +4,7 @@
 #include "interrupts.h"
 #include "mem_manager.h"
 #include "frame_buffer.h"
+#include "etc.h"
 
 int main() 
 {
@@ -20,5 +21,16 @@ int main()
         fb_write_string(80*2*i, s,5);
         freeMem(s, 5);
     }
+    //Sleep for 1,000,000 instructions:
+    for(int i = 0; i < 1000000; i++)
+    {
+		sleep();
+	}
+	fb_clear();
+	
+	//the OS Main Looooooooooop
+	while(1){
+		sleep();
+	}
     return 0;
 }

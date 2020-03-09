@@ -1,0 +1,3 @@
+global sleep
+	sleep:
+		NOP

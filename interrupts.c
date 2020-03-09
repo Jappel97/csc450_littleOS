@@ -2,6 +2,7 @@
 
 struct IDTDescriptor idt_descriptors[INTERRUPTS_DESCRIPTOR_COUNT];
 struct IDT idt;
+int pos;
 
 void interrupts_init_descriptor(int index, unsigned int address)
 {
@@ -41,8 +42,19 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
 	unsigned char scan_code;
 	char ascii;
     scan_code = keyboard_read_scan_code();
-    fb_clear();
     ascii = keyboard_scan_code_to_ascii(scan_code);
-    fb_write_cell(0, ascii, FB_BLACK, FB_WHITE);
+    //BACKSPACE
+    if(scan_code == 14)
+	{
+		//Decrement position and clear previous character
+		pos -= 2;
+		fb_write_cell(pos, ascii, FB_BLACK, FB_WHITE);
+	}
+	//KEYUP HANDLE (increment position)
+    if(scan_code > 83)
+    {
+		pos += 2;
+	}
+    fb_write_cell(pos, ascii, FB_BLACK, FB_WHITE);
     pic_acknowledge(interrupt);
 }
