@@ -1,4 +1,6 @@
 #include "interrupts.h"
+#include "mem_manager.h"
+#include "string.h"
 
 struct IDTDescriptor idt_descriptors[INTERRUPTS_DESCRIPTOR_COUNT];
 struct IDT idt;
@@ -37,24 +39,42 @@ void interrupts_install_idt()
 	pic_remap(PIC_1_OFFSET, PIC_2_OFFSET);
 }
 
+
 void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned int interrupt, __attribute__((unused)) struct stack_state stack)
 {
 	unsigned char scan_code;
 	char ascii;
     scan_code = keyboard_read_scan_code();
-    ascii = keyboard_scan_code_to_ascii(scan_code);
-    //BACKSPACE
-    if(scan_code == 14)
+	if(scan_code == 0x0e) //a backspace
 	{
-		//Decrement position and clear previous character
-		pos -= 2;
-		fb_write_cell(pos, ascii, FB_BLACK, FB_WHITE);
+		strshorten(interrupt_input, 1);
+		fb_clear();
+	fb_write_string(0, interrupt_prompt_string, strlen(interrupt_prompt_string));
+	fb_write_string(strlen(interrupt_prompt_string)*2, interrupt_input, strlen(interrupt_input));
 	}
-	//KEYUP HANDLE (increment position)
-    if(scan_code > 83)
-    {
-		pos += 2;
+	else if(scan_code == 0x1c) //enter key
+	{
+		char** theTokens = 0x00;
+		strtok(theTokens, interrupt_input);
+		//char* is a collecton of char (string)
+		//int* is a collection int (int array)
+		//char** is a collection of strings
+		//int** is a collection of int arrays
+
+		//strtok(theTokens, interrupt_input);
 	}
-    fb_write_cell(pos, ascii, FB_BLACK, FB_WHITE);
+	else
+	{
+		/* code */
+		ascii = keyboard_scan_code_to_ascii(scan_code);
+		char* temp = getMem(2);
+		
+		strcpy(temp, &ascii,1);
+		strcat(interrupt_input, temp);
+		freeMem(temp, strlen(temp));
+		fb_clear();
+	fb_write_string(0, interrupt_prompt_string, strlen(interrupt_prompt_string));
+	fb_write_string(strlen(interrupt_prompt_string)*2, interrupt_input, strlen(interrupt_input));
+	}
     pic_acknowledge(interrupt);
 }
