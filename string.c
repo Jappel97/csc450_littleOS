@@ -43,7 +43,10 @@ void strshorten(char* src, int shortenAmount)
     }
 }
 
-void strtok(char** dest, char* src)
+
+//Breaks a string into multiple substrings and stores them into dest
+//Returns the number of tokens
+int strtok(char** dest, char* src)
 {
     //figure out how many tokens are in src?
     //assuming each token is separated by a single space
@@ -72,25 +75,32 @@ void strtok(char** dest, char* src)
     //3 - 0 = 3
     //3 - 1 = 2
     //3 - 2 = 1
-    int offset = 0;
-    int prevOffset = strlen(src);
-    dest = (char**)getMem(numberOfTokens * sizeof(char*));
-    for(int i = 0; i < numberOfTokens; i++){
-		offset = getPosIn(src, ' ', numberOfTokens - i);
-		dest[numberOfTokens - i - 1] = getMem((prevOffset - offset) * sizeof(char));
-		strcpy(dest[i], &src[offset], (prevOffset - offset));
-		prevOffset = prevOffset - offset;
+    dest = (char**)getMem(numberOfTokens * 4); //Because 4 is the size of an address, and we need to store NumberOfTokens amount of those :)
+    char* str = getMem(strlen(src) + 1);
+    strcpy(str, src, strlen(src));
+    int currDest = numberOfTokens - 1;
+    for(int i = strlen(str); i > 0; i--){
+		if(str[i] == ' '){
+			dest[currDest] = &str[i+1];
+			currDest--;
+			str[i] = '\0';
+		}
 	}
+	dest[0] = &str[0];
+	
+	//Write a number of ?'s to the screen equal to our number of tokens
 	char* s = getMem(numberOfTokens + 1);
     strcpy(s, "\0", 1);
     for(int i = 0; i < numberOfTokens; i++)
     {
         strcat(s, "?\0");
     }
+    
     fb_clear();
     fb_write_string(0, s, strlen(s));
-    freeMem(s, numberOfTokens+1);
-
+    freeMem(s, strlen(src));
+    
+	return numberOfTokens;
 }
 
 int count_chars(char* src, char search_char)

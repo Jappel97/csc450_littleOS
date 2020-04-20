@@ -55,13 +55,9 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
 	else if(scan_code == 0x1c) //enter key
 	{
 		char** theTokens = 0x00;
-		strtok(theTokens, interrupt_input);
-		//char* is a collecton of char (string)
-		//int* is a collection int (int array)
-		//char** is a collection of strings
-		//int** is a collection of int arrays
 
-		//strtok(theTokens, interrupt_input);
+		strtok(theTokens, interrupt_input);
+		//Process theTokens
 	}
 	else
 	{
@@ -73,8 +69,8 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
 		strcat(interrupt_input, temp);
 		freeMem(temp, strlen(temp));
 		fb_clear();
-	fb_write_string(0, interrupt_prompt_string, strlen(interrupt_prompt_string));
-	fb_write_string(strlen(interrupt_prompt_string)*2, interrupt_input, strlen(interrupt_input));
+		fb_write_string(0, interrupt_prompt_string, strlen(interrupt_prompt_string));
+		fb_write_string(strlen(interrupt_prompt_string)*2, interrupt_input, strlen(interrupt_input));
 	}
     pic_acknowledge(interrupt);
 }
